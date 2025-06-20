@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  ScrollView, // Import ScrollView
+  ScrollView,
   View,
   Text,
   StyleSheet,
@@ -236,9 +236,9 @@ export default function HangmanGame() {
   const themeStyles = isDarkMode ? darkStyles : lightStyles;
 
   return (
-    <ScrollView 
-        contentContainerStyle={[styles.container, themeStyles.container]}
-        keyboardShouldPersistTaps='handled'
+    <ScrollView
+      contentContainerStyle={[styles.container, themeStyles.container]}
+      keyboardShouldPersistTaps='handled'
     >
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
 
@@ -306,25 +306,46 @@ export default function HangmanGame() {
         </Text>
       </Animated.View>
 
-      {/* Game Status */}
+      {/* Game Status and Action Buttons */}
       <View style={styles.statusContainer}>
-        <Text style={[styles.wrongGuessesText, themeStyles.text]}>
-          Wrong guesses: {wrongGuesses}/{MAX_WRONG_GUESSES}
-        </Text>
+        {gameStatus === 'playing' && (
+          <Text style={[styles.wrongGuessesText, themeStyles.text]}>
+            Wrong guesses: {wrongGuesses}/{MAX_WRONG_GUESSES}
+          </Text>
+        )}
 
         {gameStatus === 'won' && (
-          <Animated.View style={{ opacity: fadeAnim }}>
+          <Animated.View style={[{ opacity: fadeAnim }, styles.endGameContent]}>
             <Text style={[styles.statusText, styles.winText]}>
               🎉 You Won! 🎉
             </Text>
+            <TouchableOpacity
+              style={[styles.endGameButton, themeStyles.button]}
+              onPress={initializeGame}
+            >
+              <Text style={[styles.endGameButtonText, themeStyles.buttonText]}>
+                Next Question
+              </Text>
+            </TouchableOpacity>
           </Animated.View>
         )}
 
         {gameStatus === 'lost' && (
-          <Animated.View style={{ opacity: fadeAnim }}>
+          <Animated.View style={[{ opacity: fadeAnim }, styles.endGameContent]}>
             <Text style={[styles.statusText, styles.loseText]}>
-              💀 Game Over! The word was: {currentWord}
+              💀 Game Over!
             </Text>
+            <Text style={[styles.loseWordText, themeStyles.text]}>
+              The word was: {currentWord}
+            </Text>
+            <TouchableOpacity
+              style={[styles.endGameButton, themeStyles.button]}
+              onPress={initializeGame}
+            >
+              <Text style={[styles.endGameButtonText, themeStyles.buttonText]}>
+                Restart Game
+              </Text>
+            </TouchableOpacity>
           </Animated.View>
         )}
       </View>
@@ -344,25 +365,16 @@ export default function HangmanGame() {
           </TouchableOpacity>
         ))}
       </View>
-
-      {/* Restart Button */}
-      <TouchableOpacity
-        style={[styles.restartButton, themeStyles.button]}
-        onPress={initializeGame}
-      >
-        <Text style={[styles.restartButtonText, themeStyles.buttonText]}>
-          {gameStatus === 'playing' ? 'New Game' : 'Play Again'}
-        </Text>
-      </TouchableOpacity>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1, // Use flexGrow to allow the container to expand
+    flexGrow: 1,
     padding: 20,
     paddingTop: 50,
+    paddingBottom: 40,
   },
   header: {
     flexDirection: 'row',
@@ -438,14 +450,18 @@ const styles = StyleSheet.create({
   statusContainer: {
     alignItems: 'center',
     marginVertical: 15,
-    minHeight: 60,
+    minHeight: 100, // Increased height to fit button
   },
   wrongGuessesText: {
     fontSize: 16,
     marginBottom: 10,
   },
+  endGameContent: {
+    alignItems: 'center',
+    gap: 15,
+  },
   statusText: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
     textAlign: 'center',
   },
@@ -454,6 +470,10 @@ const styles = StyleSheet.create({
   },
   loseText: {
     color: '#DC3545',
+  },
+  loseWordText: {
+    fontSize: 18,
+    color: '#6c757d',
   },
   keyboardContainer: {
     flexDirection: 'row',
@@ -495,14 +515,13 @@ const styles = StyleSheet.create({
   guessedLetterText: {
     color: 'white',
   },
-  restartButton: {
-    backgroundColor: '#007AFF',
-    padding: 15,
+  endGameButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 30,
     borderRadius: 25,
     alignItems: 'center',
-    marginTop: 20,
   },
-  restartButtonText: {
+  endGameButtonText: {
     color: 'white',
     fontSize: 18,
     fontWeight: '600',
@@ -517,11 +536,11 @@ const lightStyles = StyleSheet.create({
     color: '#212529',
   },
   button: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#007AFF',
     borderColor: '#007AFF',
   },
   buttonText: {
-    color: '#007AFF',
+    color: '#FFFFFF',
   },
 });
 
