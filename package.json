@@ -2,11 +2,12 @@
   "name": "hangmangame",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
+"scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "build": "expo export -p web"
   },
   "dependencies": {
     "expo": "~53.0.11",
