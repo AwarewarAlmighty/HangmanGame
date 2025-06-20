@@ -13,6 +13,9 @@ RUN npm ci
 # Copy the rest of the application source code
 COPY . .
 
+# Generate the production build, treating warnings as non-breaking.
+RUN CI=false npm run build
+
 # Generate the production build
 RUN npm run build
 
