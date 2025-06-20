@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
+  ScrollView, // Import ScrollView
   View,
   Text,
   StyleSheet,
@@ -44,7 +45,7 @@ export default function HangmanGame() {
   const [score, setScore] = useState(0);
   const [difficulty, setDifficulty] = useState('medium');
   const [isDarkMode, setIsDarkMode] = useState(false);
-  
+
   // Animation values
   const [pulseAnim] = useState(new Animated.Value(1));
   const [shakeAnim] = useState(new Animated.Value(0));
@@ -60,12 +61,12 @@ export default function HangmanGame() {
   const initializeGame = useCallback(() => {
     const wordList = WORD_LISTS[difficulty];
     const randomWord = wordList[Math.floor(Math.random() * wordList.length)];
-    
+
     setCurrentWord(randomWord);
     setGuessedLetters([]);
     setWrongGuesses(0);
     setGameStatus('playing');
-    
+
     // Reset animations
     fadeAnim.setValue(1);
     pulseAnim.setValue(1);
@@ -82,7 +83,7 @@ export default function HangmanGame() {
     if (currentWord && currentWord.split('').every(letter => guessedLetters.includes(letter))) {
       setGameStatus('won');
       setScore(prev => prev + 10);
-      
+
       // Win animation
       Animated.sequence([
         Animated.timing(pulseAnim, {
@@ -96,7 +97,7 @@ export default function HangmanGame() {
           useNativeDriver: true,
         })
       ]).start();
-      
+
       // playSound(winSound);
       Vibration.vibrate([100, 50, 100]);
     }
@@ -106,7 +107,7 @@ export default function HangmanGame() {
   useEffect(() => {
     if (wrongGuesses >= MAX_WRONG_GUESSES) {
       setGameStatus('lost');
-      
+
       // Lose animation
       Animated.sequence([
         Animated.timing(shakeAnim, {
@@ -125,7 +126,7 @@ export default function HangmanGame() {
           useNativeDriver: true,
         })
       ]).start();
-      
+
       // playSound(loseSound);
       Vibration.vibrate([200, 100, 200, 100, 200]);
     }
@@ -159,12 +160,12 @@ export default function HangmanGame() {
           useNativeDriver: true,
         })
       ]).start();
-      
+
       // playSound(correctSound);
       Vibration.vibrate(50);
     } else {
       setWrongGuesses(prev => prev + 1);
-      
+
       // Wrong guess animation
       Animated.sequence([
         Animated.timing(shakeAnim, {
@@ -183,7 +184,7 @@ export default function HangmanGame() {
           useNativeDriver: true,
         })
       ]).start();
-      
+
       // playSound(wrongSound);
       Vibration.vibrate(100);
     }
@@ -200,7 +201,7 @@ export default function HangmanGame() {
   // Get letter button style
   const getLetterButtonStyle = (letter) => {
     const baseStyle = [styles.letterButton];
-    
+
     if (guessedLetters.includes(letter)) {
       if (currentWord.includes(letter)) {
         baseStyle.push(styles.correctLetter);
@@ -208,26 +209,26 @@ export default function HangmanGame() {
         baseStyle.push(styles.incorrectLetter);
       }
     }
-    
+
     if (isDarkMode) {
       baseStyle.push(styles.letterButtonDark);
     }
-    
+
     return baseStyle;
   };
 
   // Get letter text style
   const getLetterTextStyle = (letter) => {
     const baseStyle = [styles.letterText];
-    
+
     if (guessedLetters.includes(letter)) {
       baseStyle.push(styles.guessedLetterText);
     }
-    
+
     if (isDarkMode) {
       baseStyle.push(styles.letterTextDark);
     }
-    
+
     return baseStyle;
   };
 
@@ -235,14 +236,17 @@ export default function HangmanGame() {
   const themeStyles = isDarkMode ? darkStyles : lightStyles;
 
   return (
-    <View style={[styles.container, themeStyles.container]}>
+    <ScrollView 
+        contentContainerStyle={[styles.container, themeStyles.container]}
+        keyboardShouldPersistTaps='handled'
+    >
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <Text style={[styles.title, themeStyles.text]}>Hangman</Text>
         <View style={styles.headerControls}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.themeButton, themeStyles.button]}
             onPress={() => setIsDarkMode(!isDarkMode)}
           >
@@ -279,7 +283,7 @@ export default function HangmanGame() {
       </View>
 
       {/* Hangman Drawing */}
-      <Animated.View 
+      <Animated.View
         style={[
           styles.hangmanContainer,
           { transform: [{ translateX: shakeAnim }] }
@@ -291,7 +295,7 @@ export default function HangmanGame() {
       </Animated.View>
 
       {/* Word Display */}
-      <Animated.View 
+      <Animated.View
         style={[
           styles.wordContainer,
           { transform: [{ scale: pulseAnim }] }
@@ -307,7 +311,7 @@ export default function HangmanGame() {
         <Text style={[styles.wrongGuessesText, themeStyles.text]}>
           Wrong guesses: {wrongGuesses}/{MAX_WRONG_GUESSES}
         </Text>
-        
+
         {gameStatus === 'won' && (
           <Animated.View style={{ opacity: fadeAnim }}>
             <Text style={[styles.statusText, styles.winText]}>
@@ -315,7 +319,7 @@ export default function HangmanGame() {
             </Text>
           </Animated.View>
         )}
-        
+
         {gameStatus === 'lost' && (
           <Animated.View style={{ opacity: fadeAnim }}>
             <Text style={[styles.statusText, styles.loseText]}>
@@ -350,13 +354,13 @@ export default function HangmanGame() {
           {gameStatus === 'playing' ? 'New Game' : 'Play Again'}
         </Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1, // Use flexGrow to allow the container to expand
     padding: 20,
     paddingTop: 50,
   },
